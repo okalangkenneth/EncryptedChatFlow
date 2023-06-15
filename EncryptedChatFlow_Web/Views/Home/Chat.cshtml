@@ -1,0 +1,31 @@
+﻿@model EncryptedChatFlow_Web.Views.ViewModels.ChatViewModel
+
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <input type="text" id="userInput" placeholder="Type your username..." />
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button type="button" id="sendButton">Send</button>
+</div>
+
+<div id="messagesList">
+    <!-- Messages will be appended here by the JavaScript code -->
+</div>
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="~/lib/signalr/signalr.min.js"></script>
+
+<script type="text/javascript">
+    var apiEndpoint = '@Model.ApiEndpoint'; // Passes ApiEndpoint to external JavaScript
+</script>
+
+<script src="~/js/chat.js"></script>
+
+
+
+
