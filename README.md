@@ -281,6 +281,63 @@ public void ConfigureServices(IServiceCollection services)
 These snippets show how the application uses SendGrid for email notifications and Redis for caching to enhance performance and scalability.
 
 The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
+
+Here are the code snippets related to Cross-Origin Resource Sharing (CORS) policy and API rate limiting:
+### CORS Policy:
+The Startup.cs file in the EncryptedChatFlow project configures the CORS policy. Here's a snippet of the ConfigureServices method:
+
+````
+public void ConfigureServices(IServiceCollection services)
+{
+    //... (Other service configurations)
+    services.AddCors(options =>
+    {
+        options.AddPolicy("AllowSpecificOrigin",
+            builder =>
+            {
+                builder.WithOrigins("https://www.example.com")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+    });
+    //... (Other service configurations)
+}
+````
+And here's a snippet of the Configure method where the CORS policy is applied:
+
+````
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    //... (Other middleware configurations)
+    app.UseCors("AllowSpecificOrigin");
+    //... (Other middleware configurations)
+}
+````
+### API Rate Limiting: 
+The Startup.cs file in the EncryptedChatFlow project also configures API rate limiting. Here's a snippet of the ConfigureServices method:
+````
+public void ConfigureServices(IServiceCollection services)
+{
+    //... (Other service configurations)
+    services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+    services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+    services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+    services.AddInMemoryRateLimiting();
+    services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+    //... (Other service configurations)
+}
+````
+And here's a snippet of the Configure method where the rate limiting middleware is applied:
+````
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    //... (Other middleware configurations)
+    app.UseIpRateLimiting();
+    //... (Other middleware configurations)
+}
+````
+
 On the client-side, JavaScript is employed for token management and chat interactions. Ocelot is implemented as a reverse proxy to handle incoming requests efficiently and route them to the appropriate services.
 Moreover, audit logs are used to keep a record of user activities, strengthening the application's security by providing traceability and accountability. The overall architecture of the application is segmented into three interconnected projects: the API, the Client, and the Ocelot project, each playing a vital role in ensuring a seamless, secure chat environment."
 
