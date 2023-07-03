@@ -23,7 +23,7 @@ namespace EncryptedChatFlow.Tests
         {
             // Arrange
             var client = _factory.CreateClient();
-            var userTokenRequest = new UserTokenRequest { Email = "okalang.ds@gmail.com.com" };
+            var userTokenRequest = new UserTokenRequest { Email = "okalang.ds@gmail.com" };
 
             // Act
             var response = await client.PostAsync("/api/token", new StringContent(JsonConvert.SerializeObject(userTokenRequest), Encoding.UTF8, "application/json"));
