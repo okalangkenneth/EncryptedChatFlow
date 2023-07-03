@@ -14,7 +14,13 @@ crucial role in ensuring a seamless, user-friendly application experience."
     > 
 2. **Technical Details**:
     
-    > "The chat application is built on a .NET Core backend, handling user authentication and message transmission. ASP.NET Core Identity was used to manage user data, while SignalR facilitated real-time communication between the server and clients. JWTs were used for stateless, secure authentication, stored in HttpOnly cookies to prevent XSS attacks. On the client-side, JavaScript was used for token management and chat interactions. To handle incoming requests and route them to the appropriate services, Ocelot was implemented as a reverse proxy. Furthermore, audit logs were employed to keep a record of user activities, bolstering the application's security by providing traceability."
+    > "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
+For stateless and secure authentication, JSON Web Tokens (JWTs) are employed and stored in HttpOnly cookies to prevent Cross-Site Scripting (XSS) attacks. The application also integrates Google Login for a smoother and faster authentication experience.
+Email notifications are handled using SendGrid, a reliable cloud-based email delivery service. To enhance performance and scalability, Redis and in-memory caching techniques are implemented.
+The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
+On the client-side, JavaScript is employed for token management and chat interactions. Ocelot is implemented as a reverse proxy to handle incoming requests efficiently and route them to the appropriate services.
+Moreover, audit logs are used to keep a record of user activities, strengthening the application's security by providing traceability and accountability. The overall architecture of the application is segmented into three interconnected projects: the API, the Client, and the Ocelot project, each playing a vital role in ensuring a seamless, secure chat environment."
+"
     > 
 3. **Challenges & Solutions**:
     
