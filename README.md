@@ -160,7 +160,82 @@ These snippets show how the application uses ASP.NET Core Identity for user mana
 
     
 For stateless and secure authentication, JSON Web Tokens (JWTs) are employed and stored in HttpOnly cookies to prevent Cross-Site Scripting (XSS) attacks. The application also integrates Google Login for a smoother and faster authentication experience.
+Here are the code snippets related to JSON Web Tokens (JWTs):
+### JWT Authentication: 
+The TokenController.cs file in the EncryptedChatFlow project handles the generation of JWTs. Here's a snippet of the GetToken method:
 
+````
+[HttpPost]
+public async Task<IActionResult> GetToken([FromBody] UserTokenRequest model)
+{
+    var user = await _userManager.FindByEmailAsync(model.Email);
+    if (user == null)
+    {
+        return BadRequest("Invalid user data");
+    }
+    var userRoles = await _userManager.GetRolesAsync(user);
+    var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    };
+    foreach (var userRole in userRoles)
+    {
+        claims.Add(new Claim(ClaimTypes.Role, userRole));
+    }
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:MySuperSecretKey"]));
+    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+    var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtSettings:ExpirationInDays"]));
+    var token = new JwtSecurityToken(
+        issuer: _configuration["JwtSettings:Issuer"],
+        audience: _configuration["JwtSettings:Audience"],
+        claims: claims,
+        notBefore: DateTime.UtcNow,
+        expires: expires,
+        signingCredentials: creds
+    );
+    return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+}
+````
+### JWT Storage in HttpOnly Cookies: 
+The AccountsController.cs file in the EncryptedChatFlow_Web project handles the storage of JWTs in HttpOnly cookies. Here's a snippet of the Login method:
+
+````
+[HttpPost]
+public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+{
+    //... (User authentication code)
+    if (result.Succeeded)
+    {
+        var user = await _userManager.FindByNameAsync(model.Email);
+        if (user == null)
+        {
+            return View(model);
+        }
+        var requestBody = new UserTokenRequest { Email = model.Email };
+        var requestBodyJson = JsonConvert.SerializeObject(requestBody);
+        //... (HTTP request to API code)
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBodyObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseBody);
+            if (responseBodyObject.ContainsKey("token"))
+            {
+                var token = responseBodyObject["token"];
+                _logger.LogInformation($"Got token: {token}");
+                Response.Cookies.Append(
+                    "jwt_cookie",
+                    token,
+                    new CookieOptions { Secure = true, SameSite = SameSiteMode.Lax }
+                );
+            }
+        }
+        return RedirectToAction("Chat", "Home");
+    }
+    //... (Other code)
+}
+````
 
 Email notifications are handled using SendGrid, a reliable cloud-based email delivery service. To enhance performance and scalability, Redis and in-memory caching techniques are implemented.
 The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
