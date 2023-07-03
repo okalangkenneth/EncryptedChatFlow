@@ -1,6 +1,17 @@
 # Leveraging .NET Core, SignalR, Ocelot and Audit Logs for Secure Real-Time Messaging
 
-## **Introduction**:
+## Table of Contents:
+1. [Introduction](#introduction)
+2. [Objective](#objective)
+3. [Database Structure for Daily Data](#database-structure-for-daily-data)
+4. [Minimising Data Loss](#minimising-data-loss)
+5. [Efficient Data Integration](#efficient-data-integration)
+6. [Consolidated File Storage](#consolidated-file-storage)
+7. [Preparing Data for Power BI Reporting](#preparing-data-for-power-bi-reporting)
+8. [Business Requirement Changes](#business-requirement-changes)
+9. [Integration of New Datasets](#integration-of-new-datasets)
+
+## Introduction:
     
 "The objective of this project was to develop a secure, real-time chat application by harnessing an array of technologies including 
 .NET Core, ASP.NET Core Identity, SignalR, JSON Web Tokens (JWTs), SendGrid, Google login, and Redis. 
