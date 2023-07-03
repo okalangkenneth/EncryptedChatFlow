@@ -14,8 +14,9 @@ crucial role in ensuring a seamless, user-friendly application experience."
 
 ## **Technical Details**:
     
- "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
+ "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, SignalR.
 Here are some code snippets related to user authentication and data management using ASP.NET Core Identity:
+
 ### ApplicationUser Model (EncryptedChatFlow/Models/ApplicationUser.cs)
 This model extends the IdentityUser class provided by ASP.NET Core Identity, which represents the registered user in the application.
 
