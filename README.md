@@ -15,6 +15,110 @@ crucial role in ensuring a seamless, user-friendly application experience."
 2. **Technical Details**:
     
     > "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
+Here are some code snippets related to user authentication and data management using ASP.NET Core Identity:
+1. ApplicationUser Model (EncryptedChatFlow/Models/ApplicationUser.cs)
+This model extends the IdentityUser class provided by ASP.NET Core Identity, which represents the registered user in the application.
+
+````using Microsoft.AspNetCore.Identity;
+namespace EncryptedChatFlow.Models
+{
+    public class ApplicationUser : IdentityUser
+    {
+        public ICollection<Message> Messages { get; set; }
+    }
+}
+````
+2. TokenController (EncryptedChatFlow/Controllers/TokenController.cs)
+This controller is responsible for generating JWT tokens for authenticated users.
+````using EncryptedChatFlow.Models;
+namespace EncryptedChatFlow.Controllers
+{
+    [Route("api/token")]
+    [ApiController]
+    public class TokenController : ControllerBase
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
+
+        public TokenController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _configuration = configuration;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetToken([FromBody] UserTokenRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest("Invalid user data");
+            }
+            //... (JWT token generation code)
+        }
+    }
+}
+````
+3. AccountsController (EncryptedChatFlow_Web/Controllers/AccountsController.cs)
+This controller handles user registration, login, and logout operations.
+
+````
+using EncryptedChatFlow.Models;
+namespace EncryptedChatFlow_Web.Controllers
+{
+    [Authorize]
+    public class AccountsController : Controller
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<AccountsController> _logger;
+        private readonly IEmailSender _emailSender;
+
+        public AccountsController(ILogger<AccountsController> logger, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
+        {
+            _logger = logger;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _emailSender = emailSender;
+        }
+
+        //... (Login, Logout, Register methods)
+    }
+}
+````
+4. Startup Configuration (EncryptedChatFlow/Startup.cs)
+This class configures services and the app's request pipeline. It includes the configuration of the Identity service.
+````
+namespace EncryptedChatFlow
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            //... (Other service configurations)
+        }
+
+        //... (Configure method)
+    }
+}
+````
+These snippets show how the application uses ASP.NET Core Identity for user management and authentication. The ApplicationUser model is used to represent users, and the TokenController and AccountsController handle user authentication operations. The Startup class configures the Identity service and other necessary services for the application.
+
+    
 For stateless and secure authentication, JSON Web Tokens (JWTs) are employed and stored in HttpOnly cookies to prevent Cross-Site Scripting (XSS) attacks. The application also integrates Google Login for a smoother and faster authentication experience.
 Email notifications are handled using SendGrid, a reliable cloud-based email delivery service. To enhance performance and scalability, Redis and in-memory caching techniques are implemented.
 The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
