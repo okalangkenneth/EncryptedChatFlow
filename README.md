@@ -117,7 +117,8 @@ namespace EncryptedChatFlow
     }
 }
 ````
-### Real-time communication with SignalR: The ChatHub class is a SignalR hub that manages real-time communication. It has methods for sending messages and handling user connections and disconnections.
+### Real-time communication with SignalR: 
+The ChatHub class is a SignalR hub that manages real-time communication. It has methods for sending messages and handling user connections and disconnections.
 
 ````
 using EncryptedChatFlow.Data;
