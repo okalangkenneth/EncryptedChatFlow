@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -29,6 +30,13 @@ namespace EncryptedChatFlow
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(config =>
+            {
+                config.AddDebug(); // Log to debug (Visual Studio Output window while debugging)
+                config.AddConsole(); // Log to console
+                                     // Other loggers can be added here.
+            });
+
             services.AddHttpClient();
 
             services.AddSignalR(hubOptions =>
@@ -64,24 +72,6 @@ namespace EncryptedChatFlow
             // Configure ApiEndpoint
             services.Configure<ApiEndpointSettings>(Configuration.GetSection("ApiEndpoint"));
 
-            services.AddAuthentication()
-        .AddGoogle(options =>
-        {
-            IConfigurationSection googleAuthNSection =
-                Configuration.GetSection("Authentication:Google");
-
-            options.ClientId = googleAuthNSection["ClientId"];
-            options.ClientSecret = googleAuthNSection["ClientSecret"];
-        })
-        .AddFacebook(options =>
-        {
-            IConfigurationSection fbAuthNSection =
-                Configuration.GetSection("Authentication:Facebook");
-
-            options.AppId = fbAuthNSection["AppId"];
-            options.AppSecret = fbAuthNSection["AppSecret"];
-        });
-
             services.AddDbContext<ApplicationDbContext>(options =>
              options.UseSqlServer(
             Configuration.GetConnectionString("DefaultConnection")));
@@ -92,27 +82,29 @@ namespace EncryptedChatFlow
 
             services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
 
-            var key = Encoding.ASCII.GetBytes(Configuration["JwtSettings:Secret"]);
+            var key = Encoding.ASCII.GetBytes(Configuration["JwtSettings:MySuperSecretKey"]);
 
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(x =>
-            {
+             .AddJwtBearer(x =>
+{
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true, // Set to true
+                    ValidateAudience = true, // Set to true
+                    ValidIssuer = Configuration["JwtSettings:Issuer"], // Set the valid Issuer
+                    ValidAudience = Configuration["JwtSettings:Audience"] // Set the valid Audience
                 };
             });
+            services.AddAuthorization();
 
-            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
 
             services.AddControllersWithViews();
             services.AddSwaggerGen(c =>

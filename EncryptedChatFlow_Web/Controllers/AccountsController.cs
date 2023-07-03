@@ -1,11 +1,19 @@
 ﻿using EncryptedChatFlow.Models;
+using EncryptedChatFlow.Models.Dtos;
+using EncryptedChatFlow_Web.Models;
 using EncryptedChatFlow_Web.Services;
 using EncryptedChatFlow_Web.Views.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +45,11 @@ namespace EncryptedChatFlow_Web.Controllers
         {
             return View();
         }
-        [HttpPost]
+
+        
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -51,6 +61,48 @@ namespace EncryptedChatFlow_Web.Controllers
 
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByNameAsync(model.Email);
+                if (user == null)
+                {
+                    // You might want to handle this case differently
+                    return View(model);
+                }
+
+                // Prepare the request body data
+                var requestBody = new UserTokenRequest { Email = model.Email };
+                var requestBodyJson = JsonConvert.SerializeObject(requestBody);
+
+                // Send a request to your API to get a JWT token
+                using (var httpClient = new HttpClient())
+                {
+                    var content = new StringContent(requestBodyJson, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync("https://localhost:44305/api/token", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        var responseBodyObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseBody);
+
+                        if (responseBodyObject.ContainsKey("token"))
+                        {
+                            var token = responseBodyObject["token"];
+
+                            _logger.LogInformation($"Got token: {token}");  // Add this line
+
+                            Response.Cookies.Append(
+                                "jwt_cookie",
+                                token,
+                                new CookieOptions
+                                {
+                                     //HttpOnly = true,  // Temporarily comment this line
+                                    Secure = true, // in production, set this to true to enforce transmission over HTTPS
+                            SameSite = SameSiteMode.Lax // set according to your requirements
+                                }
+                            );
+                        }
+                    }
+                }
+
                 return RedirectToAction("Chat", "Home");
             }
             else if (result.IsLockedOut)
@@ -66,14 +118,16 @@ namespace EncryptedChatFlow_Web.Controllers
         }
 
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            Response.Cookies.Delete("jwt_cookie"); // delete the jwt cookie
+            _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
+
 
         private IActionResult RedirectToLocal(string returnUrl)
         {
@@ -152,7 +206,6 @@ namespace EncryptedChatFlow_Web.Controllers
             return View("Error");
         }
 
-
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
@@ -173,6 +226,20 @@ namespace EncryptedChatFlow_Web.Controllers
                 info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
+                // Set JWT as a HttpOnly, Secure, and SameSite cookie here
+                string jwtToken = await GetJwtFromApiAsync(info);  // You will need to implement this
+
+                Response.Cookies.Append(
+                    "jwt",
+                    jwtToken,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // Ensure the cookie is sent over HTTPS
+                SameSite = SameSiteMode.Strict // Prevents the cookie from being sent in cross-site requests
+            }
+                );
+
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -202,6 +269,75 @@ namespace EncryptedChatFlow_Web.Controllers
             }
         }
 
+        private async Task<string> GetJwtFromApiAsync(ExternalLoginInfo info)
+        {
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var client = new HttpClient();
+
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new { Email = email }),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await client.PostAsync("https://localhost:44305/auth", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(jsonResponse);
+
+                return tokenResponse.Token;
+            }
+            else
+            {
+                throw new Exception("Failed to retrieve JWT token from API");
+            }
+        }
+
+        public async Task<string> GetJwtOrRefresh()
+        {
+            var jwt = Request.Cookies["jwt"];
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var token = jwtHandler.ReadJwtToken(jwt);
+
+            // Check if token is close to expiring
+            if (token.ValidTo > DateTime.UtcNow.AddMinutes(5))
+            {
+                return jwt;
+            }
+
+            // Refresh token
+            var client = new HttpClient();
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new { Token = jwt }),
+                Encoding.UTF8,
+                "application/json");
+            var response = await client.PostAsync("https://localhost:44305/auth/refresh", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(jsonResponse);
+
+                // Set new JWT as a cookie
+                Response.Cookies.Append(
+                    "jwt",
+                    tokenResponse.Token,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict
+                    }
+                );
+
+                return tokenResponse.Token;
+            }
+            else
+            {
+                throw new Exception("Failed to refresh JWT token");
+            }
+        }
 
 
         [HttpGet]
@@ -210,7 +346,6 @@ namespace EncryptedChatFlow_Web.Controllers
         {
             return View();
         }
-
 
         [HttpPost]
         [AllowAnonymous]
@@ -285,12 +420,10 @@ namespace EncryptedChatFlow_Web.Controllers
             return View();
         }
 
-
         public IActionResult ResetPasswordConfirmation()
         {
             return View();
         }
-
 
         private void AddErrors(IdentityResult result)
         {
@@ -299,10 +432,6 @@ namespace EncryptedChatFlow_Web.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-
-
-
-
 
 
 

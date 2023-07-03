@@ -2,7 +2,9 @@ using EncryptedChatFlow.Data;
 using EncryptedChatFlow.Models;
 using EncryptedChatFlow_Web.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +35,7 @@ namespace EncryptedChatFlow_Web
 
             services.AddSingleton(Log.Logger);
 
-           
+            services.AddSignalR();
 
             services.AddTransient<IEmailSender, SendGridEmailSender>();
             services.AddSingleton<ISendGridClient>(x => new SendGridClient(Configuration["SendGrid:ApiKey"]));
@@ -97,13 +99,39 @@ namespace EncryptedChatFlow_Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            // Middleware for error handling. 
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    context.Response.StatusCode = 500; // or another status code of your choice
+                    context.Response.ContentType = "text/html";
+
+                    var errorFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                    if (errorFeature != null)
+                    {
+                        var exception = errorFeature.Error;
+
+                        // log the exception, e.g.
+                        logger.LogError(exception, "An error occurred while processing your request.");
+
+                        await context.Response.WriteAsync("<h1>An error occurred while processing your request.</h1>");
+                        await context.Response.WriteAsync(new string(' ', 512)); // Padding for IE
+                    }
+                });
+            });
+
+
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
+            app.UseMiddleware<ValidateTokenMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            
 
             app.UseEndpoints(endpoints =>
             {
@@ -111,7 +139,7 @@ namespace EncryptedChatFlow_Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                //endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
 
             app.UseSerilogRequestLogging();

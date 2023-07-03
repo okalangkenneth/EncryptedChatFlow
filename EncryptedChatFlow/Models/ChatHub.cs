@@ -55,6 +55,11 @@ namespace EncryptedChatFlow.Models
             await Clients.All.SendAsync("ReceiveMessage", DateTime.Now.ToString(), "Chat server", "A participant has left the chat.");
             await base.OnDisconnectedAsync(exception);
         }
+
+        public async Task AccessTokenExpired()
+        {
+            await Clients.Caller.SendAsync("AccessTokenExpired");
+        }
     }
 }
 

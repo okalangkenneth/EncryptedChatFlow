@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -36,8 +37,12 @@ namespace EncryptedChatFlow.Controllers
         // GET api/messages
         [HttpGet]
         [Authorize(Roles = "Admin, User")] // Both Admin and User can view all messages
+       
+
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation("This is an information log");
+
             try
             {
                 var cacheKey = "allMessages";
@@ -107,7 +112,7 @@ namespace EncryptedChatFlow.Controllers
                 await _context.SaveChangesAsync();
 
                 // After the message is saved, use the hub context to send the message to all connected clients.
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", message.Timestamp, message.User, message.Content);
 
                 return Ok(message);
             }
