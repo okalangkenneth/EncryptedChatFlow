@@ -16,7 +16,7 @@ crucial role in ensuring a seamless, user-friendly application experience."
     
     > "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
 Here are some code snippets related to user authentication and data management using ASP.NET Core Identity:
-1- ApplicationUser Model (EncryptedChatFlow/Models/ApplicationUser.cs)
+### ApplicationUser Model (EncryptedChatFlow/Models/ApplicationUser.cs)
 This model extends the IdentityUser class provided by ASP.NET Core Identity, which represents the registered user in the application.
 
 ````using Microsoft.AspNetCore.Identity;
@@ -28,7 +28,7 @@ namespace EncryptedChatFlow.Models
     }
 }
 ````
-2- TokenController (EncryptedChatFlow/Controllers/TokenController.cs)
+### TokenController (EncryptedChatFlow/Controllers/TokenController.cs)
 This controller is responsible for generating JWT tokens for authenticated users.
 ````using EncryptedChatFlow.Models;
 namespace EncryptedChatFlow.Controllers
@@ -59,7 +59,7 @@ namespace EncryptedChatFlow.Controllers
     }
 }
 ````
-3- AccountsController (EncryptedChatFlow_Web/Controllers/AccountsController.cs)
+### AccountsController (EncryptedChatFlow_Web/Controllers/AccountsController.cs)
 This controller handles user registration, login, and logout operations.
 
 ````
@@ -86,7 +86,7 @@ namespace EncryptedChatFlow_Web.Controllers
     }
 }
 ````
-4- Startup Configuration (EncryptedChatFlow/Startup.cs)
+### Startup Configuration (EncryptedChatFlow/Startup.cs)
 This class configures services and the app's request pipeline. It includes the configuration of the Identity service.
 ````
 namespace EncryptedChatFlow
