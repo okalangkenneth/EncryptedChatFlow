@@ -438,6 +438,9 @@ Here is an example of a unit test done on the 'Get' method of the 'MessagesContr
     
 Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests.
 
+Chat Interface.
+[encryptedChatFlow.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/38602e64-748c-4941-9ab3-e0ef3bec98d6)
+
 ## Conclusion:
     
 This project demonstrates the effective combination of .NET Core, SignalR, Ocelot, and audit logs to create a secure, real-time messaging platform. The inclusion of extensive testing ensures the application is robust and reliable. This application could serve a variety of real-world use cases, such as live customer support, real-time collaboration tools, or secure inter-office communication—any scenario that requires real-time, secure messaging with traceability of user actions.
