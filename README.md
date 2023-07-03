@@ -439,7 +439,7 @@ Here is an example of a unit test done on the 'Get' method of the 'MessagesContr
 Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests.
 
 Chat Interface.
-[encryptedChatFlow.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/38602e64-748c-4941-9ab3-e0ef3bec98d6)
+[Demo.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/0919fdf4-9ab0-41d6-a040-3ce25c946c38)
 
 ## Conclusion:
     
