@@ -4,9 +4,9 @@
 1. [Introduction](#introduction)
 2. [Technical Details](#technical-details)
 3. [Challenges & Solutions](#challenges-solutions)
-4. [Testing](#Testing)
-5. [Demonstration](#Demonstration)
-6. [Conclusion](#Conclusion)
+4. [Testing](#testing)
+5. [Demonstration](#demonstration)
+6. [Conclusion](#conclusion)
 
 
 ## Introduction:
