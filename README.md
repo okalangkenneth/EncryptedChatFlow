@@ -339,7 +339,79 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 ````
 
 On the client-side, JavaScript is employed for token management and chat interactions. Ocelot is implemented as a reverse proxy to handle incoming requests efficiently and route them to the appropriate services.
-Moreover, audit logs are used to keep a record of user activities, strengthening the application's security by providing traceability and accountability. The overall architecture of the application is segmented into three interconnected projects: the API, the Client, and the Ocelot project, each playing a vital role in ensuring a seamless, secure chat environment."
+Moreover, audit logs are used to keep a record of user activities, strengthening the application's security by providing traceability and accountability. 
+Here are the relevant code snippets for the audit logs:
+### Logging in the MessagesController.cs file:
+The application uses the ILogger interface for logging. Here is an example of how it's used in the MessagesController.cs file:
+
+````
+private readonly ILogger<MessagesController> _logger;
+
+public MessagesController(IHubContext<ChatHub> hubContext, ApplicationDbContext context, ILogger<MessagesController> logger, IDistributedCache cache)
+{
+    _hubContext = hubContext;
+    _context = context;
+    _logger = logger;
+    _cache = cache;
+}
+
+[HttpGet]
+[Authorize(Roles = "Admin, User")]
+public async Task<IActionResult> Get()
+{
+    _logger.LogInformation("This is an information log");
+    ...
+}
+````
+In the above code, the logger is injected into the MessagesController and used to log an informational message when the Get() method is called.
+### Logging in the Startup.cs file (in the EncryptedChatFlow_Web project):
+The application uses Serilog for logging. Here is how it's configured in the Startup.cs file:
+
+````
+public Startup(IConfiguration configuration)
+{
+    Configuration = configuration;
+    Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(configuration)
+        .CreateLogger();
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+{
+    ...
+    app.UseSerilogRequestLogging();
+    ...
+}
+````
+In the above code, the logger is configured in the Startup constructor and then used in the Configure method to log requests.
+
+### Logging in the AccountsController.cs file (in the EncryptedChatFlow_Web project):
+The application uses the ILogger interface for logging. Here is an example of how it's used in the AccountsController.cs file:
+````
+private readonly ILogger<AccountsController> _logger;
+
+public AccountsController(ILogger<AccountsController> logger, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
+{
+    _logger = logger;
+    _userManager = userManager;
+    _signInManager = signInManager;
+    _emailSender = emailSender;
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Logout()
+{
+    await _signInManager.SignOutAsync();
+    Response.Cookies.Delete("jwt_cookie");
+    _logger.LogInformation("User logged out.");
+    return RedirectToAction(nameof(HomeController.Index), "Home");
+}
+
+````
+In the above code, the logger is injected into the AccountsController and used to log an informational message when the Logout() method is called.These logs can be used to keep a record of user activities, strengthening the application's security by providing traceability and accountability.
+
+The overall architecture of the application is segmented into three interconnected projects: the API, the Client, and the Ocelot project, each playing a vital role in ensuring a seamless, secure chat environment."
 
     
 3. **Challenges & Solutions**:
