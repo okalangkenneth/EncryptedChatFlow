@@ -32,9 +32,9 @@ namespace EncryptedChatFlow
         {
             services.AddLogging(config =>
             {
-                config.AddDebug(); // Log to debug (Visual Studio Output window while debugging)
-                config.AddConsole(); // Log to console
-                                     // Other loggers can be added here.
+                config.AddDebug(); 
+                config.AddConsole(); 
+                                     
             });
 
             services.AddHttpClient();
