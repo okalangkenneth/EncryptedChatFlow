@@ -7,7 +7,7 @@
 To further fortify security, a CORS policy has been implemented for secure handling of cross-origin requests and responses. We've adopted Google login for robust authentication and SendGrid for reliable email delivery services. Redis, a versatile in-memory data structure store, has been employed as a database and cache, thereby augmenting our application's performance and scalability. Moreover, our API incorporates a rate limiting protocol, effectively safeguarding against potential denial-of-service attacks.
 
 These diverse technologies interweave across three interconnected projects - the API, client, and Ocelot project - each serving a crucial role in ensuring a seamless, user-friendly application experience."
-    > 
+    
 2. **Technical Details**:
     
     > "The chat application is built on a .NET Core backend, handling user authentication and message transmission. ASP.NET Core Identity was used to manage user data, while SignalR facilitated real-time communication between the server and clients. JWTs were used for stateless, secure authentication, stored in HttpOnly cookies to prevent XSS attacks. On the client-side, JavaScript was used for token management and chat interactions. To handle incoming requests and route them to the appropriate services, Ocelot was implemented as a reverse proxy. Furthermore, audit logs were employed to keep a record of user activities, bolstering the application's security by providing traceability."
