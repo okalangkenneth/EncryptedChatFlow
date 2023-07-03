@@ -431,7 +431,7 @@ The integration of multiple components—real-time chat, secure authentication, 
     
 Unit tests and integration tests were used extensively throughout the project to ensure the reliable functionality of each component. These tests helped verify user authentication, message transmission, JWT management, correct request routing through Ocelot, and accurate recording of user actions in the audit logs. They were instrumental in maintaining high code quality and catching potential issues early in the development process.
 Here is a a screen shot of unit test done on the 'Get' method of the 'MessagesController' which is supposed to return a list of messages and an integration test for user authentication.
-
+![EncryptedChatFlow](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/50c65f93-388f-40e1-ae69-258f9948a876)
 
 ## Demonstration:
     
