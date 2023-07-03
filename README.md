@@ -422,7 +422,7 @@ The overall architecture of the application is segmented into three interconnect
     
 "Unit tests and integration tests were used extensively throughout the project to ensure the reliable functionality of each component. These tests helped verify user authentication, message transmission, JWT management, correct request routing through Ocelot, and accurate recording of user actions in the audit logs. They were instrumental in maintaining high code quality and catching potential issues early in the development process."
 
-"## 5. **Demonstration**:
+## 5. **Demonstration**:
     
 "Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests."
 
