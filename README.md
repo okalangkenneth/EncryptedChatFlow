@@ -238,6 +238,48 @@ public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = 
 ````
 
 Email notifications are handled using SendGrid, a reliable cloud-based email delivery service. To enhance performance and scalability, Redis and in-memory caching techniques are implemented.
+Here are the code snippets related to SendGrid email notifications and Redis caching:
+### SendGrid Email Notifications: 
+The SendGridEmailSender.cs file in the EncryptedChatFlow_Web project handles the sending of emails using SendGrid. Here's a snippet of the SendEmailAsync method:
+
+````
+public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+{
+    var msg = new SendGridMessage()
+    {
+        From = new EmailAddress("ken@backendinsight.com", "Kenneth Okalang"),
+        Subject = subject,
+        PlainTextContent = htmlMessage,
+        HtmlContent = htmlMessage
+    };
+    msg.AddTo(new EmailAddress(email));
+    msg.SetClickTracking(false, false);
+    try
+    {
+        var response = await _client.SendEmailAsync(msg);
+        _logger.LogInformation($"Email sent with status {response.StatusCode}");
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while sending email.");
+    }
+}
+````
+### Redis Caching: 
+The Startup.cs file in the EncryptedChatFlow project configures Redis caching. Here's a snippet of the ConfigureServices method:
+````
+public void ConfigureServices(IServiceCollection services)
+{
+    //... (Other service configurations)
+    services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = Configuration.GetConnectionString("Redis");
+    });
+    //... (Other service configurations)
+}
+````
+These snippets show how the application uses SendGrid for email notifications and Redis for caching to enhance performance and scalability.
+
 The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
 On the client-side, JavaScript is employed for token management and chat interactions. Ocelot is implemented as a reverse proxy to handle incoming requests efficiently and route them to the appropriate services.
 Moreover, audit logs are used to keep a record of user activities, strengthening the application's security by providing traceability and accountability. The overall architecture of the application is segmented into three interconnected projects: the API, the Client, and the Ocelot project, each playing a vital role in ensuring a seamless, secure chat environment."
