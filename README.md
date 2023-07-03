@@ -14,7 +14,7 @@ crucial role in ensuring a seamless, user-friendly application experience."
 
 ## **Technical Details**:
     
- "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, SignalR.
+ "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
 Here are some code snippets related to user authentication and data management using ASP.NET Core Identity:
 
 ### ApplicationUser Model (EncryptedChatFlow/Models/ApplicationUser.cs)
@@ -117,10 +117,50 @@ namespace EncryptedChatFlow
     }
 }
 ````
+### Real-time communication with SignalR: The ChatHub class is a SignalR hub that manages real-time communication. It has methods for sending messages and handling user connections and disconnections.
+
+````
+using EncryptedChatFlow.Data;
+namespace EncryptedChatFlow.Models{
+    public class ChatHub : Hub {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public ChatHub(ApplicationDbContext context, UserManager<ApplicationUser> userManager) {
+            _context = context;
+            _userManager = userManager;
+        }
+        public async Task SendMessage(string userName, string message) {
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null) {
+                throw new Exception("User not found");
+            }
+            var newMessage = new Message { Content = message, Timestamp = DateTime.Now, UserId = user.Id };
+            _context.Messages.Add(newMessage);
+            await _context.SaveChangesAsync();
+            await Clients.All.SendAsync("ReceiveMessage", newMessage.Timestamp.ToString(), userName, message);
+        }
+        public override async Task OnConnectedAsync() {
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now.ToString(), "Chat server", "A new participant has joined the chat!");
+            await base.OnConnectedAsync();
+        }
+        public override async Task OnDisconnectedAsync(Exception exception) {
+            await Clients.All.SendAsync("ReceiveMessage", DateTime.Now.ToString(), "Chat server", "A participant has left the chat.");
+            await base.OnDisconnectedAsync(exception);
+        }
+        public async Task AccessTokenExpired() {
+            await Clients.Caller.SendAsync("AccessTokenExpired");
+        }
+    }
+}
+
+````
+
 These snippets show how the application uses ASP.NET Core Identity for user management and authentication. The ApplicationUser model is used to represent users, and the TokenController and AccountsController handle user authentication operations. The Startup class configures the Identity service and other necessary services for the application.
 
     
 For stateless and secure authentication, JSON Web Tokens (JWTs) are employed and stored in HttpOnly cookies to prevent Cross-Site Scripting (XSS) attacks. The application also integrates Google Login for a smoother and faster authentication experience.
+
+
 Email notifications are handled using SendGrid, a reliable cloud-based email delivery service. To enhance performance and scalability, Redis and in-memory caching techniques are implemented.
 The application is designed with a strong emphasis on security, using a comprehensive Cross-Origin Resource Sharing (CORS) policy for safe handling of cross-origin requests. Additionally, API rate limiting is implemented to protect against potential denial-of-service attacks.
 On the client-side, JavaScript is employed for token management and chat interactions. Ocelot is implemented as a reverse proxy to handle incoming requests efficiently and route them to the appropriate services.
