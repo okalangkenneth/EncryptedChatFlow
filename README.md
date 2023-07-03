@@ -2,14 +2,12 @@
 
 ## Table of Contents:
 1. [Introduction](#introduction)
-2. [Objective](#objective)
-3. [Database Structure for Daily Data](#database-structure-for-daily-data)
-4. [Minimising Data Loss](#minimising-data-loss)
-5. [Efficient Data Integration](#efficient-data-integration)
-6. [Consolidated File Storage](#consolidated-file-storage)
-7. [Preparing Data for Power BI Reporting](#preparing-data-for-power-bi-reporting)
-8. [Business Requirement Changes](#business-requirement-changes)
-9. [Integration of New Datasets](#integration-of-new-datasets)
+2. [Technical Details](#technical-details)
+3. [Challenges & Solutions](#challenges-solutions)
+4. [Testing](#Testing)
+5. [Demonstration](#Demonstration)
+6. [Conclusion](#Conclusion)
+
 
 ## Introduction:
     
@@ -23,7 +21,7 @@ Moreover, our API incorporates a rate limiting protocol, effectively safeguardin
 These diverse technologies interweave across three interconnected projects - the API, client, and Ocelot project - each serving a 
 crucial role in ensuring a seamless, user-friendly application experience."
 
-## **Technical Details**:
+## Technical Details:
     
  "The chat application is built on a .NET Core backend, handling user authentication, message transmission, and various other functionalities. ASP.NET Core Identity is used for secure user data management, while real-time communication between the server and clients is facilitated by SignalR.
 Here are some code snippets related to user authentication and data management using ASP.NET Core Identity:
