@@ -22,11 +22,11 @@ namespace EncryptedChatFlow.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly IHubContext<ChatHub> _hubContext;
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly ILogger<MessagesController> _logger;
         private readonly IDistributedCache _cache;
 
-        public MessagesController(IHubContext<ChatHub> hubContext, ApplicationDbContext context, ILogger<MessagesController> logger, IDistributedCache cache)
+        public MessagesController(IHubContext<ChatHub> hubContext, IApplicationDbContext context, ILogger<MessagesController> logger, IDistributedCache cache)
         {
             _hubContext = hubContext;
             _context = context;
@@ -69,9 +69,21 @@ namespace EncryptedChatFlow.Controllers
                     return Ok(messages);
                 }
             }
+            catch (DbUpdateException e)
+            {
+                // Handle database update exceptions
+                _logger.LogError(e, "A database update error occurred while fetching messages");
+                return StatusCode(StatusCodes.Status500InternalServerError, "A database error occurred.");
+            }
+            catch (JsonException e)
+            {
+                // Handle JSON serialization/deserialization exceptions
+                _logger.LogError(e, "A JSON error occurred while fetching messages");
+                return StatusCode(StatusCodes.Status500InternalServerError, "A JSON error occurred.");
+            }
             catch (Exception e)
             {
-                // Log the error message to Serilog
+                // Handle all other exceptions
                 _logger.LogError(e, "An error occurred while fetching messages");
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
