@@ -2,10 +2,10 @@
 
 ## Table of Contents:
 1. [Introduction](#introduction)
-2. [Technical Details](#technical-details)
-3. [Challenges & Solutions](#challenges-solutions)
-4. [Testing](#testing)
-5. [Demonstration](#demonstration)
+2. [Demonstration](#demonstration)
+3. [Technical Details](#technical-details)
+4. [Challenges & Solutions](#challenges-solutions)
+5. [Testing](#testing)
 6. [Conclusion](#conclusion)
 
 
@@ -20,6 +20,14 @@ Redis, a versatile in-memory data structure store, has been employed as a databa
 Moreover, our API incorporates a rate limiting protocol, effectively safeguarding against potential denial-of-service attacks.
 These diverse technologies interweave across three interconnected projects - the API, client, and Ocelot project - each serving a 
 crucial role in ensuring a seamless, user-friendly application experience."
+
+## Demonstration:
+    
+Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests.
+
+Chat Interface.
+[Demo.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/0919fdf4-9ab0-41d6-a040-3ce25c946c38)
+
 
 ## Technical Details:
     
@@ -434,12 +442,7 @@ Here is an example of a unit test done on the 'Get' method of the 'MessagesContr
 
 ![EncryptedChatFlow](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/50c65f93-388f-40e1-ae69-258f9948a876)
 
-## Demonstration:
-    
-Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests.
 
-Chat Interface.
-[Demo.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/0919fdf4-9ab0-41d6-a040-3ce25c946c38)
 
 ## Conclusion:
     
