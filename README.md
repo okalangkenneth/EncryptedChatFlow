@@ -23,7 +23,7 @@ crucial role in ensuring a seamless, user-friendly application experience."
 
 ## Demonstration:
     
-Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication, and how each user action is recorded in the audit logs. Additionally, observe the role of Ocelot in managing requests.
+Here's a demo of the chat application in action. Notice how messages are exchanged in real time, how the application handles user authentication. 
 
 Chat Interface.
 [Demo.webm](https://github.com/okalangkenneth/EncryptedChatFlow/assets/68539411/0919fdf4-9ab0-41d6-a040-3ce25c946c38)
