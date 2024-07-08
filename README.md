@@ -15,7 +15,7 @@
 .NET Core, ASP.NET Core Identity, SignalR, JSON Web Tokens (JWTs), SendGrid, Google login, and Redis. 
 The application integrates Ocelot as a reverse proxy, directing the client's requests to appropriate microservices, and incorporates an audit logging mechanism for maintaining a comprehensive history of user actions.
 To further fortify security, a CORS policy has been implemented for secure handling of cross-origin requests and responses. 
-We've adopted Google login for robust authentication and SendGrid for reliable email delivery services. 
+I have adopted Google login for robust authentication and SendGrid for reliable email delivery services. 
 Redis, a versatile in-memory data structure store, has been employed as a database and cache, thereby augmenting our application's performance and scalability.
 Moreover, our API incorporates a rate limiting protocol, effectively safeguarding against potential denial-of-service attacks.
 These diverse technologies interweave across three interconnected projects - the API, client, and Ocelot project - each serving a 
